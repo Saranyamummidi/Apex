@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stylish Registration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #2BC0E4, #EAECC6);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+      color: #fff;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      animation: fadeSlide 1s ease forwards;
+    }
+
+    header h1 {
+      font-size: 2.8rem;
+      color: #fff;
+      text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+    }
+
+    header p {
+      font-size: 1.2rem;
+      color: #f1f1f1;
+      margin-top: 0.5rem;
+    }
+
+    @keyframes fadeSlide {
+      0% {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      animation: fadeInUp 1.2s ease;
+    }
+
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #fff;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .input-group {
+      position: relative;
+    }
+
+    .input-group i {
+      position: absolute;
+      top: 50%;
+      left: 16px;
+      transform: translateY(-50%);
+      color: #00d4ff;
+      font-size: 1.1rem;
+    }
+
+    .input-group input,
+    .input-group select {
+      width: 100%;
+      padding: 0.9rem 1rem 0.9rem 3rem;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      background: rgba(255,255,255,0.9);
+      color: #333;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .input-group input:focus,
+    .input-group select:focus {
+      box-shadow: 0 0 10px #00eaff;
+    }
+
+    button {
+      background: linear-gradient(135deg, #00eaff, #007adf);
+      border: none;
+      padding: 1rem;
+      font-size: 1rem;
+      color: #fff;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: scale(1.03);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    #formMessage {
+      text-align: center;
+      margin-top: 1rem;
+      font-weight: bold;
+      color: #ffeb3b;
+    }
+
+    #registrationList {
+      list-style: none;
+      padding: 0;
+      margin-top: 1rem;
+    }
+
+    #registrationList li {
+      background: rgba(255,255,255,0.2);
+      padding: 0.9rem;
+      border-radius: 10px;
+      margin-bottom: 0.6rem;
+      color: #fff;
+    }
+
+    ul li strong {
+      color: #ffe600;
+    }
+
+    p {
+      margin: 0.5rem 0;
+    }
+
+    @media (max-width: 600px) {
+      .card {
+        padding: 1.4rem;
+      }
+
+      header h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Stylish Registration</h1>
+    <p>Create your account below</p>
+  </header>
+
+  <div class="container">
+    <section class="card">
+      <h2>Sign Up</h2>
+      <form id="registrationForm">
+        <div class="input-group">
+          <i class="fas fa-user"></i>
+          <input type="text" id="name" name="name" placeholder="Full Name" required />
+        </div>
+        <div class="input-group">
+          <i class="fas fa-envelope"></i>
+          <input type="email" id="email" name="email" placeholder="Email Address" required />
+        </div>
+        <div class="input-group">
+          <i class="fas fa-phone-alt"></i>
+          <input type="tel" id="phone" name="phone" placeholder="Phone Number" required />
+        </div>
+        <div class="input-group">
+          <i class="fas fa-user-tag"></i>
+          <select id="role" name="role" required>
+            <option value="">Select Role</option>
+            <option value="Student">Student</option>
+            <option value="Teacher">Teacher</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+        <button type="submit">Register</button>
+        <div id="formMessage"></div>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Registered Users</h2>
+      <ul id="registrationList"></ul>
+    </section>
+  </div>
+
+  <script>
+    const form = document.getElementById('registrationForm');
+    const list = document.getElementById('registrationList');
+    const message = document.getElementById('formMessage');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const role = document.getElementById('role').value;
+
+      if (!name || !email || !phone || !role) {
+        message.textContent = 'Please complete all fields.';
+        message.style.color = '#ffeb3b';
+        return;
+      }
+
+      const listItem = document.createElement('li');
+      listItem.innerHTML = `
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Phone:</strong> ${phone}</p>
+        <p><strong>Role:</strong> ${role}</p>
+      `;
+
+      list.appendChild(listItem);
+      form.reset();
+      message.textContent = 'Registration successful!';
+      message.style.color = '#a5ff90';
+    });
+  </script>
+
+</body>
+</html>
