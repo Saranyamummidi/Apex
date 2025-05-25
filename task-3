@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Travel Destination Explorer</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #fddb92, #d1fdff);
+      padding: 20px;
+      color: #333;
+    }
+
+    .explorer {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    select {
+      padding: 10px;
+      width: 70%;
+      border-radius: 8px;
+      border: 1px solid #aaa;
+      margin-right: 10px;
+    }
+
+    button {
+      padding: 10px 18px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #218838;
+    }
+
+    .result {
+      margin-top: 20px;
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .weather {
+      margin-top: 12px;
+      font-style: italic;
+    }
+
+    img.flag {
+      vertical-align: middle;
+      border-radius: 3px;
+    }
+
+    .attraction {
+      margin-top: 20px;
+    }
+
+    .attraction img {
+      width: 100%;
+      max-height: 250px;
+      border-radius: 10px;
+      object-fit: cover;
+      margin-top: 10px;
+    }
+
+    .loading {
+      text-align: center;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <div class="explorer">
+    <h1>🧭 Travel Destination Explorer</h1>
+    <div class="input-group">
+      <select id="countrySelect">
+        <option value="">-- Select a Country --</option>
+      </select>
+      <button onclick="exploreCountry()">Explore</button>
+    </div>
+    <div id="result" class="result"></div>
+  </div>
+
+  <script>
+    const weatherApiKey = "YOUR_WEATHER_API_KEY";
+    const unsplashKey = "YOUR_UNSPLASH_ACCESS_KEY";
+    const tips = [
+      "Always carry local currency.",
+      "Check travel advisories before booking.",
+      "Respect local customs and dress codes.",
+      "Try local food — but know what’s safe.",
+      "Use offline maps to save data.",
+      "Be cautious with street vendors.",
+      "Buy travel insurance before you go.",
+    ];
+
+    async function loadCountries() {
+      try {
+        const res = await fetch('https://restcountries.com/v3.1/all');
+        const data = await res.json();
+        const select = document.getElementById('countrySelect');
+        const sorted = data.sort((a, b) => a.name.common.localeCompare(b.name.common));
+
+        sorted.forEach(country => {
+          const option = document.createElement('option');
+          option.value = country.name.common;
+          option.textContent = country.name.common;
+          select.appendChild(option);
+        });
+      } catch (err) {
+        console.error("Failed to load countries:", err);
+      }
+    }
+
+    async function exploreCountry() {
+      const country = document.getElementById("countrySelect").value;
+      const result = document.getElementById("result");
+
+      if (!country) {
+        result.innerHTML = `<p>❗ Please select a country.</p>`;
+        return;
+      }
+
+      result.innerHTML = `<div class="loading">⏳ Loading...</div>`;
+
+      try {
+        const res = await fetch(`https://restcountries.com/v3.1/name/${country}`);
+        const data = await res.json();
+        const c = data[0];
+
+        const name = c.name.common;
+        const capital = c.capital?.[0] || "N/A";
+        const population = c.population.toLocaleString();
+        const region = c.region;
+        const flag = c.flags.svg;
+        const languages = Object.values(c.languages || {}).join(', ');
+        const currencies = Object.values(c.currencies || {}).map(c => c.name).join(', ');
+        const randomTip = tips[Math.floor(Math.random() * tips.length)];
+
+        let weatherHTML = `<p class="weather">🌦️ Weather info not available.</p>`;
+        try {
+          const weatherRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${capital}&appid=${weatherApiKey}&units=metric`);
+          const weatherData = await weatherRes.json();
+          if (weatherData.main && weatherData.weather) {
+            const temp = weatherData.main.temp;
+            const condition = weatherData.weather[0].description;
+            weatherHTML = `<p class="weather">🌦️ <strong>Weather in ${capital}:</strong> ${temp}°C, ${condition}</p>`;
+          }
+        } catch (wErr) {
+          console.warn("Weather error:", wErr);
+        }
+
+        result.innerHTML = `
+          <h2>${name} <img class="flag" src="${flag}" alt="Flag of ${name}" width="40"/></h2>
+          <p><strong>Capital:</strong> ${capital}</p>
+          <p><strong>Region:</strong> ${region}</p>
+          <p><strong>Population:</strong> ${population}</p>
+          <p><strong>Languages:</strong> ${languages || 'N/A'}</p>
+          <p><strong>Currencies:</strong> ${currencies || 'N/A'}</p>
+          ${weatherHTML}
+          <p><strong>🧳 Travel Tip:</strong> ${randomTip}</p>
+          <div class="attraction">
+            <h3>🌍 Top Tourist Attractions</h3>
+            <div id="attractions">Loading attractions and photos...</div>
+          </div>
+        `;
+
+        await loadAttractions(name);
+
+      } catch (error) {
+        console.error("Fetch error:", error);
+        result.innerHTML = `<p>❌ Country not found or weather unavailable.</p>`;
+      }
+    }
+
+    async function loadAttractions(countryName) {
+      const container = document.getElementById('attractions');
+
+      const samplePlaces = {
+        "France": ["Eiffel Tower", "Louvre Museum", "Mont Saint-Michel"],
+        "India": ["Taj Mahal", "Qutub Minar", "Jaipur City Palace"],
+        "USA": ["Statue of Liberty", "Grand Canyon", "Yellowstone National Park"],
+      };
+
+      const attractions = samplePlaces[countryName] || ["Top spot 1", "Top spot 2", "Top spot 3"];
+      const imagePromises = attractions.map(place => fetchUnsplashImage(place));
+
+      const images = await Promise.all(imagePromises);
+
+      container.innerHTML = attractions.map((place, i) => `
+        <div style="margin-bottom: 15px;">
+          <strong>${place}</strong>
+          <img src="${images[i]}" alt="${place}" />
+          <p><em>⭐ Reviews and 🏨 hotels nearby — coming soon...</em></p>
+        </div>
+      `).join('');
+    }
+
+    async function fetchUnsplashImage(query) {
+      try {
+        const res = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&client_id=${unsplashKey}`);
+        const data = await res.json();
+        return data.results[0]?.urls?.regular || 'https://via.placeholder.com/400x250?text=No+Image';
+      } catch (err) {
+        console.error("Unsplash error:", err);
+        return 'https://via.placeholder.com/400x250?text=No+Image';
+      }
+    }
+
+    loadCountries();
+  </script>
+</body>
+</html>
